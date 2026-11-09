@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220"><title>Paris – VDF Express</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#121d2e;--panel2:#172438;--line:#26364d;--muted:#91a1b7;--text:#edf3fb;--green:#36d399;--orange:#ffb454;--red:#ff6b75;--blue:#69a9ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#1b3452 0,var(--bg) 55%);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
+header{padding:26px 18px 18px;text-align:center}h1{font-size:25px;margin:0;font-weight:850;letter-spacing:-.6px}header p{color:var(--muted);margin:7px 0 0;font-size:13px}main{max-width:650px;margin:auto;padding:0 14px 30px}
+.directions{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#0d1726;border:1px solid var(--line);padding:5px;border-radius:15px}
+button{font:inherit;cursor:pointer}.dir{border:0;background:transparent;color:var(--muted);padding:12px 8px;border-radius:11px;font-weight:750;font-size:13px}.dir.active{background:#243b58;color:white;box-shadow:0 2px 10px #0004}
+.route{display:flex;align-items:center;justify-content:center;gap:9px;color:#b8c8dc;font-size:12px;margin:17px 0 14px}.station{font-weight:750;color:var(--text)}.arrow{color:var(--blue);font-size:18px}
+.card{background:linear-gradient(150deg,#17263a,#111c2d);border:1px solid var(--line);border-radius:20px;padding:19px;margin:12px 0;box-shadow:0 12px 30px #0002}
+.cardhead{display:flex;justify-content:space-between;align-items:center;gap:10px}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:1.1px;color:var(--muted);font-weight:800}.pill{font-size:11px;font-weight:800;padding:5px 9px;border-radius:30px;background:#26384e;color:#c6d8ed}
+.big{font-size:52px;line-height:1.05;font-weight:900;letter-spacing:-2px;margin:13px 0 3px}.unit{font-size:15px;color:var(--muted);font-weight:650;letter-spacing:0}.sub{font-size:13px;color:var(--muted)}
+.verdict{margin-top:17px;padding:14px;border-radius:14px;background:#142d2b;border:1px solid #235448}.verdict strong{display:block;font-size:22px;color:var(--green)}.verdict span{font-size:13px;color:#b7d7ce}
+.alt{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:16px;margin-top:12px}.alt h2{font-size:15px;margin:0 0 8px}.steps{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.step{padding:8px 12px;border-radius:10px;background:#1c2d43;font-weight:800}.plus{color:var(--muted)}
+.info{font-size:12px;color:var(--muted);margin:13px 3px;line-height:1.55}.status{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;margin:15px 3px}.dot{width:8px;height:8px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 4px #ffb45418}
+.refresh{display:block;width:100%;border:1px solid var(--line);background:#17263a;color:var(--text);padding:12px;border-radius:12px;font-weight:750;margin-top:13px}.refresh:active,.dir:active{transform:scale(.99)}
+.setup{background:#101b2b;border:1px dashed #3a506c;border-radius:15px;padding:14px;margin-top:16px}.setup strong{font-size:13px}.setup p{font-size:12px;color:var(--muted);margin:6px 0 0}.footer{text-align:center;font-size:11px;color:#71839b;margin:18px 6px}
+@media(min-width:520px){header{padding-top:36px}.card{padding:23px}.big{font-size:60px}}
+</style></head>
+<body>
+<header><h1>🚆 Paris – VDF Express</h1><p>Le bon itinéraire, sans perdre de temps</p></header>
+<main>
+ <nav class="directions" aria-label="Sens du trajet">
+  <button class="dir active" id="out" aria-pressed="true">Gare du Nord → VDF</button>
+  <button class="dir" id="back" aria-pressed="false">VDF → Gare du Nord</button>
+ </nav>
+ <div class="route"><span class="station" id="from">Paris Gare du Nord</span><span class="arrow">⇄</span><span class="station" id="to">Val-de-Fontenay</span></div>
+ <section class="card">
+  <div class="cardhead"><span class="eyebrow">Prochain RER E</span><span class="pill" id="e-status">Flux non connecté</span></div>
+  <div class="big" id="wait">— <span class="unit">min</span></div>
+  <div class="sub" id="departure">Prochain départ : en attente des données</div>
+  <div class="verdict" id="verdict"><strong>Décision indisponible</strong><span>Le flux temps réel sera nécessaire pour calculer l'attente.</span></div>
+ </section>
+ <section class="alt">
+  <h2>Itinéraire alternatif</h2>
+  <div class="steps" id="alternative"><span class="step">RER B</span><span class="plus">+</span><span class="step">RER A</span></div>
+  <p class="info" id="alt-note">Si l'attente du E dépasse 10 minutes, prends l'itinéraire alternatif.</p>
+ </section>
+ <div class="status"><span class="dot"></span><span id="live-status">Prototype prêt · données temps réel non configurées</span></div>
+ <button class="refresh" id="refresh">↻ Actualiser</button>
+ <div class="setup"><strong>Connexion des horaires en direct</strong><p>Cette page est prête côté interface. Pour afficher les prochains départs du RER E et vérifier les perturbations, il faudra connecter un flux IDFM. La clé d'accès ne devra pas être intégrée directement dans cette page publique GitHub.</p></div>
+ <p class="footer">Décision basée sur l'attente avant le départ du RER E · Seuil : 10 min</p>
+</main>
+<script>
+let direction='out';
+const $=id=>document.getElementById(id);
+function setDirection(d){direction=d;const out=d==='out';$('out').classList.toggle('active',out);$('back').classList.toggle('active',!out);$('out').setAttribute('aria-pressed',String(out));$('back').setAttribute('aria-pressed',String(!out));$('from').textContent=out?'Paris Gare du Nord':'Val-de-Fontenay';$('to').textContent=out?'Val-de-Fontenay':'Paris Gare du Nord';$('alternative').innerHTML=out?'<span class="step">RER B</span><span class="plus">+</span><span class="step">RER A</span>':'<span class="step">RER A</span><span class="plus">+</span><span class="step">RER B</span>';}
+$('out').addEventListener('click',()=>setDirection('out'));$('back').addEventListener('click',()=>setDirection('back'));
+$('refresh').addEventListener('click',()=>{$('live-status').textContent='Aucune source temps réel configurée pour le moment.';});
+// Branchement futur : window.TRAIN_API_URL doit désigner un proxy renvoyant
+// { rerE: { departure: ISO-8601, scheduledDeparture: ISO-8601, platform: string|null, status: string }, updatedAt: ISO-8601 }
+// Ne jamais placer une clé API privée dans le code public GitHub Pages.
+</script>
+</body></html>
